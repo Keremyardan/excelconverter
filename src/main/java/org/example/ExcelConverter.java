@@ -24,6 +24,7 @@ public class ExcelConverter {
 
         JButton openButton = new JButton("Excel Dosyasını Aç");
         JButton exportButton = new JButton("Dosyayı Kaydet");
+        exportButton.setEnabled(false);
         JTable table = new JTable();
         JScrollPane scrollPane = new JScrollPane(table);
 
@@ -33,6 +34,7 @@ public class ExcelConverter {
             if (option == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
                 loadExcelToTable(file, table);
+                exportButton.setEnabled(true);
             }
         });
 
