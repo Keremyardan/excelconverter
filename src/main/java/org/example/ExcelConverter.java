@@ -43,6 +43,9 @@ public class ExcelConverter {
             int option = fileChooser.showSaveDialog(frame);
             if (option == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
+                if(!file.getName().toLowerCase().endsWith(".xlsx")) {
+                    file = new File(file.getAbsolutePath()+".xlsx");
+                }
                 exportTableToExcel(table, file);
             }
         });
