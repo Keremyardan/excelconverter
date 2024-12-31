@@ -26,22 +26,24 @@ public class ExcelConverter {
 
         String logoPath = "src/main/resources/logo.png";
         JLabel logoLabel = new JLabel();
-        logoLabel.setHorizontalAlignment(SwingConstants.CENTER); // Ortada hizala
+        logoLabel.setHorizontalAlignment(SwingConstants.CENTER);
         logoLabel.setVerticalAlignment(SwingConstants.CENTER);
         File logoFile = new File(logoPath);
+
         if (logoFile.exists()) {
             ImageIcon logoIcon = new ImageIcon(logoFile.getAbsolutePath());
-            Image scaledImage = logoIcon.getImage().getScaledInstance(300, 100, Image.SCALE_SMOOTH);
+            Image scaledImage = logoIcon.getImage().getScaledInstance(400, 100, Image.SCALE_SMOOTH);
             logoLabel.setIcon(new ImageIcon(scaledImage));
         } else {
             logoLabel.setText("Logo not found!");
         }
 
-        // Logo üst kısma ekleniyor
+
         panel.add(logoLabel, BorderLayout.NORTH);
 
         JButton openButton = new JButton("Excel Dosyasını Aç");
         JButton exportButton = new JButton("Dosyayı Kaydet");
+
         exportButton.setEnabled(false);
         JTable table = new JTable();
         JScrollPane scrollPane = new JScrollPane(table);
