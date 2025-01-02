@@ -20,7 +20,7 @@ public class ExcelConverter {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 600);
 
-        String iconPath = "src/main/resources/logo.png";
+        String iconPath = "src/main/resources/icon.png";
         File iconfile = new File(iconPath);
         if (iconfile.exists()) {
 
