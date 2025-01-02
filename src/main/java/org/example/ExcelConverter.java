@@ -20,6 +20,17 @@ public class ExcelConverter {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 600);
 
+        String iconPath = "Ssrc/main/resources/icon.png";
+        File iconfile = new File(iconPath);
+        if (iconfile.exists()) {
+
+            ImageIcon icon = new ImageIcon(iconfile.getAbsolutePath());
+            frame.setIconImage(icon.getImage());
+
+        }else {
+            System.out.println("Image is not available");
+        }
+
         frame.setLocationRelativeTo(null);
 
         JPanel panel = new JPanel(new BorderLayout());
