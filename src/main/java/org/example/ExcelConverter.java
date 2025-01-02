@@ -98,14 +98,16 @@ public class ExcelConverter {
             Sheet sheet = workbook.getSheetAt(0);
             DefaultTableModel model = new DefaultTableModel();
 
+            // Sütun başlıklarını A, B, C, ... şeklinde oluşturduk
+            int columnCount = sheet.getRow(0).getPhysicalNumberOfCells(); // İlk satırdaki hücre sayısını al
+            for (int i = 0; i < columnCount; i++) {
+                char columnLetter = (char) ('A' + i);
+                model.addColumn(String.valueOf(columnLetter));
+            }
+
+            // Verileri satırlara ekledik
             for (Row row : sheet) {
                 int cellCount = row.getLastCellNum();
-                if (model.getColumnCount() < cellCount) {
-                    for (int i = model.getColumnCount(); i < cellCount; i++) {
-                        model.addColumn("Column " + (i + 1));
-                    }
-                }
-
                 Object[] rowData = new Object[cellCount];
                 for (int i = 0; i < cellCount; i++) {
                     Cell cell = row.getCell(i);
