@@ -153,32 +153,71 @@ public class ExcelConverter {
 
             DefaultTableModel model = (DefaultTableModel) table.getModel();
 
+            // Get the date from A2 (second row, first column)
+            String siparisTarihi = model.getValueAt(1, 0).toString(); // A2 is row 1, column 0
+
+            // Iterate through the rows of the input table
             for (int i = 0; i < model.getRowCount(); i++) {
                 Row row = sheet.createRow(i + 1);
 
-                row.createCell(0).setCellValue("Toyota"); // Proje
-                row.createCell(1).setCellValue(""); // Müşteri
-                row.createCell(2).setCellValue("Oluşturuldu"); // Sipariş Durumu
-                row.createCell(3).setCellValue(""); // Sipariş Türü
-                row.createCell(4).setCellValue(""); // Yükleme Tipi
+                // Proje: Always "Toyota"
+                row.createCell(0).setCellValue("Toyota");
+                // Müşteri: Always "00005"
+                row.createCell(1).setCellValue("00005");
+                // Sipariş Durumu: Always "Oluşturuldu"
+                row.createCell(2).setCellValue("Oluşturuldu");
+                // Sipariş Türü: Always "Müşteriden Alınacak"
+                row.createCell(3).setCellValue("Müşteriden Alınacak");
+                // Yükleme Tipi: Always "Parsiyel"
+                row.createCell(4).setCellValue("Parsiyel");
 
-                row.createCell(5).setCellValue(model.getValueAt(i, 0).toString()); // Sipariş Tarihi (A2 den gelen veri)
-                row.createCell(6).setCellValue(""); // Yükleme Firması
-                row.createCell(7).setCellValue(""); // Yükleme Firması Adres Tipi
-                row.createCell(8).setCellValue(""); // Boşaltma Firması
-                row.createCell(9).setCellValue(""); // Boşaltma Firması Adres Tipi
+                // Sipariş Tarihi: From A2 (siparisTarihi)
+                row.createCell(5).setCellValue(siparisTarihi);
 
-                row.createCell(10).setCellValue(""); // Müşteri İrsaliye
-                row.createCell(11).setCellValue(""); // İrsaliye seri
-                row.createCell(12).setCellValue(model.getValueAt(i, 2).toString()); // İrsaliye no
-                row.createCell(13).setCellValue(""); // Yük Numarası
-                row.createCell(14).setCellValue(""); // Model
+                // Yükleme Firması: Always "00005"
+                row.createCell(6).setCellValue("00005");
 
-                row.createCell(15).setCellValue(model.getValueAt(i, 4).toString()); // Şasi No
-                row.createCell(16).setCellValue(model.getValueAt(i, 5).toString()); // Lokasyon
-                row.createCell(17).setCellValue("TOYOTA"); // Marka
-                row.createCell(18).setCellValue("Araç"); // Kap Cinsi
-                row.createCell(19).setCellValue(8); // Adet (örnekte sabit)
+                // Yükleme Firması Adres Tipi: First word of "Bayi Adı" (cell 1)
+                String bayiAdı = model.getValueAt(i, 1).toString();
+                String[] bayiAdıParts = bayiAdı.split(" ");
+                row.createCell(7).setCellValue(bayiAdıParts.length > 0 ? bayiAdıParts[0] : "");
+
+                // Boşaltma Firması: First word of "Bayi Adı" (cell 1)
+                row.createCell(8).setCellValue(bayiAdıParts.length > 0 ? bayiAdıParts[0] : "");
+
+                // Boşaltma Firması Adres Tipi: Second word of "Bayi Adı" (cell 1)
+                row.createCell(9).setCellValue(bayiAdıParts.length > 1 ? bayiAdıParts[1] : "");
+
+                // Müşteri İrsaliye: From "İrsaliye No" (cell 2)
+                row.createCell(10).setCellValue(model.getValueAt(i, 2).toString());
+
+                // İrsaliye Seri: Left empty
+                row.createCell(11).setCellValue("");
+
+                // İrsaliye No: Left empty
+                row.createCell(12).setCellValue("");
+
+                // Yük Numarası: From "Tır No" (first column)
+                row.createCell(13).setCellValue(model.getValueAt(i, 0).toString());
+
+                // Model: From "Mal Adı" (cell 6)
+                row.createCell(14).setCellValue(model.getValueAt(i, 6).toString());
+
+                // Şasi No: From "Şasi No" (cell 4)
+                row.createCell(15).setCellValue(model.getValueAt(i, 4).toString());
+
+                // Lokasyon: First word of "Bayi Adı" (cell 1)
+                row.createCell(16).setCellValue(bayiAdıParts.length > 0 ? bayiAdıParts[0] : "");
+
+                // Marka: Always "TOYOTA"
+                row.createCell(17).setCellValue("TOYOTA");
+
+                // Kap Cinsi: Always "Araç"
+                row.createCell(18).setCellValue("Araç");
+
+                // Adet: From "Tırdaki Araç Sayısı" (last column, cell 19)
+                int adet = 0; // You can get this value based on your specific structure
+                row.createCell(19).setCellValue(adet);
             }
 
             try (FileOutputStream fos = new FileOutputStream(outputFile)) {
