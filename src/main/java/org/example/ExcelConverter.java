@@ -7,6 +7,8 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ExcelConverter {
     public static void main(String[] args) {
@@ -156,6 +158,10 @@ public class ExcelConverter {
             // Get the date from A2 (second row, first column)
             String siparisTarihi = model.getValueAt(1, 0).toString(); // A2 is row 1, column 0
 
+            // Get the "Yük Numarası" from A1 (first row, first column)
+            String a1Value = model.getValueAt(0, 0).toString(); // A1 is row 0, column 0
+            String yukNumarasi = extractYukNumarasi(a1Value);
+
             // Iterate through the rows of the input table
             for (int i = 0; i < model.getRowCount(); i++) {
                 Row row = sheet.createRow(i + 1);
@@ -185,12 +191,11 @@ public class ExcelConverter {
                 // Boşaltma Firması: Second word of "Bayi Adı"
                 row.createCell(8).setCellValue(bayiAdıParts.length > 1 ? bayiAdıParts[1] : "");
 
-// Boşaltma Firması Adres Tipi: First word of "Bayi Adı"
+                // Boşaltma Firması Adres Tipi: First word of "Bayi Adı"
                 row.createCell(9).setCellValue(bayiAdıParts.length > 0 ? bayiAdıParts[0] : "");
 
-
                 // Müşteri İrsaliye: From "İrsaliye No" (cell 2)
-                row.createCell(10).setCellValue(model.getValueAt(i, 2).toString());
+                row.createCell(10).setCellValue(model.getValueAt(7, 3).toString());
 
                 // İrsaliye Seri: Left empty
                 row.createCell(11).setCellValue("");
@@ -198,14 +203,14 @@ public class ExcelConverter {
                 // İrsaliye No: Left empty
                 row.createCell(12).setCellValue("");
 
-                // Yük Numarası: From "Tır No" (first column)
-                row.createCell(13).setCellValue(model.getValueAt(i, 0).toString());
+                // Yük Numarası: Using the extracted value
+                row.createCell(13).setCellValue(yukNumarasi);
 
                 // Model: From "Mal Adı" (cell 6)
                 row.createCell(14).setCellValue(model.getValueAt(i, 6).toString());
 
                 // Şasi No: From "Şasi No" (cell 4)
-                row.createCell(15).setCellValue(model.getValueAt(i, 4).toString());
+                row.createCell(15).setCellValue(model.getValueAt(i, 8).toString());
 
                 // Lokasyon: First word of "Bayi Adı" (cell 1)
                 row.createCell(16).setCellValue(bayiAdıParts.length > 0 ? bayiAdıParts[0] : "");
@@ -216,8 +221,19 @@ public class ExcelConverter {
                 // Kap Cinsi: Always "Araç"
                 row.createCell(18).setCellValue("Araç");
 
-                // Adet: From "Tırdaki Araç Sayısı" (last column, cell 19)
-                int adet = 0; // You can get this value based on your specific structure
+                // Adet: From "F12" (cell F12, row 11, column 5)
+                String adetStr = model.getValueAt(11, 5).toString(); // F12 is row 11, column 5
+                double adetDouble = 0.0;
+
+                try {
+                    adetDouble = Double.parseDouble(adetStr); // Parse as double
+                } catch (NumberFormatException e) {
+                    // Handle case if F12 is not a valid number (could be empty or non-numeric)
+                    System.out.println("Invalid number format for Adet: " + adetStr);
+                }
+
+                // Optionally, round the value to the nearest integer or just cast to int
+                int adet = (int) Math.round(adetDouble); // Round to the nearest integer
                 row.createCell(19).setCellValue(adet);
             }
 
@@ -230,4 +246,16 @@ public class ExcelConverter {
             JOptionPane.showMessageDialog(null, "Error exporting file: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+    // Method to extract Yük Numarası (TIR part) from the given string
+    private static String extractYukNumarasi(String input) {
+        // Using regular expression to match "TIR" followed by digits
+        Pattern pattern = Pattern.compile("TIR\\d+");
+        Matcher matcher = pattern.matcher(input);
+        if (matcher.find()) {
+            return matcher.group(); // Return the matched "TIR" followed by digits
+        }
+        return ""; // Return empty string if no match found
+    }
+
 }
