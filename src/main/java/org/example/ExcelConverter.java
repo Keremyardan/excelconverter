@@ -178,15 +178,16 @@ public class ExcelConverter {
                 row.createCell(6).setCellValue("00005");
 
                 // Yükleme Firması Adres Tipi: First word of "Bayi Adı" (cell 1)
-                String bayiAdı = model.getValueAt(i, 1).toString();
+                String bayiAdı = model.getValueAt(4, 3).toString();
                 String[] bayiAdıParts = bayiAdı.split(" ");
                 row.createCell(7).setCellValue(bayiAdıParts.length > 0 ? bayiAdıParts[0] : "");
 
-                // Boşaltma Firması: First word of "Bayi Adı" (cell 1)
-                row.createCell(8).setCellValue(bayiAdıParts.length > 0 ? bayiAdıParts[0] : "");
+                // Boşaltma Firması: Second word of "Bayi Adı"
+                row.createCell(8).setCellValue(bayiAdıParts.length > 1 ? bayiAdıParts[1] : "");
 
-                // Boşaltma Firması Adres Tipi: Second word of "Bayi Adı" (cell 1)
-                row.createCell(9).setCellValue(bayiAdıParts.length > 1 ? bayiAdıParts[1] : "");
+// Boşaltma Firması Adres Tipi: First word of "Bayi Adı"
+                row.createCell(9).setCellValue(bayiAdıParts.length > 0 ? bayiAdıParts[0] : "");
+
 
                 // Müşteri İrsaliye: From "İrsaliye No" (cell 2)
                 row.createCell(10).setCellValue(model.getValueAt(i, 2).toString());
