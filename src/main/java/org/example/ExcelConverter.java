@@ -140,6 +140,7 @@ public class ExcelConverter {
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Converted Data");
 
+            // Define headers
             String[] headers = {
                     "Proje", "Müşteri", "Sipariş Durumu", "Sipariş Türü", "Yükleme Tipi",
                     "Sipariş Tarihi", "Yükleme Firması", "Yükleme Firması Adres Tipi",
@@ -148,23 +149,27 @@ public class ExcelConverter {
                     "Lokasyon", "Marka", "Kap Cinsi", "Adet"
             };
 
+            // Add headers to the sheet
             Row headerRow = sheet.createRow(0);
             for (int i = 0; i < headers.length; i++) {
                 headerRow.createCell(i).setCellValue(headers[i]);
             }
 
+            // Get data from the JTable model
             DefaultTableModel model = (DefaultTableModel) table.getModel();
 
+            // Get order date from second row, first column (A2)
             String orderDate = model.getValueAt(1, 0).toString(); // A2 is row 1, column 0
 
-            // Get the "Yük Numarası" from A1 (first row, first column)
+            // Get "Yük Numarası" from A1 (first row, first column)
             String a1Value = model.getValueAt(0, 0).toString(); // A1 is row 0, column 0
             String cargoNo = extractCargoNo(a1Value);
 
+            // Loop through the rows of the model and transfer data to the Excel sheet
             for (int i = 1; i < model.getRowCount(); i++) {  // Start from index 1 to skip header
                 Row row = sheet.createRow(i);
 
-                // Add values to the row
+                // Fill the row with data
                 row.createCell(0).setCellValue("Toyota");
                 row.createCell(1).setCellValue("00005");
                 row.createCell(2).setCellValue("Oluşturuldu");
@@ -188,14 +193,16 @@ public class ExcelConverter {
                 row.createCell(17).setCellValue("TOYOTA");
                 row.createCell(18).setCellValue("Araç");
 
+                // Get the "Adet" value (column 5)
                 String amountStr = model.getValueAt(i, 5).toString(); // F12 is row 11, column 5
+                String formattedAmount = removeTrailingZeros(amountStr);
 
-                // Check if the value is numeric before parsing
-                int amount = isNumeric(amountStr) ? (int) Math.round(Double.parseDouble(amountStr)) : 0;
+                // Set the formatted amount in the row
+                row.createCell(19).setCellValue(formattedAmount); // Column 19 is where "Adet" is
 
-                row.createCell(19).setCellValue(amount);
             }
 
+            // Write the workbook to the output file
             try (FileOutputStream fos = new FileOutputStream(outputFile)) {
                 workbook.write(fos);
             }
@@ -206,16 +213,14 @@ public class ExcelConverter {
         }
     }
 
-    private static boolean isNumeric(String str) {
-        if (str == null || str.isEmpty()) {
-            return false;
+    // Helper method to remove trailing zeros from a string
+    private static String removeTrailingZeros(String value) {
+        // Check if the value contains a decimal point
+        if (value.contains(".")) {
+            // Remove trailing zeros
+            value = value.replaceAll("0*$", "").replaceAll("\\.$", "");
         }
-        try {
-            Double.parseDouble(str); // Try parsing the string as a double
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
+        return value;
     }
 
 
