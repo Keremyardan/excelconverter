@@ -41,6 +41,48 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.2</version>
+                <executions>
+                    <!-- Execution for creating the main JAR -->
+                    <execution>
+                        <id>default-jar</id> <!-- Unique id -->
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+
+                    <!-- Execution for creating a sources JAR -->
+                    <execution>
+                        <id>sources-jar</id> <!-- Unique id for sources JAR -->
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>sources</classifier> <!-- Classifier for sources -->
+                        </configuration>
+                    </execution>
+
+                    <!-- Execution for creating a Javadoc JAR -->
+                    <execution>
+                        <id>javadoc-jar</id> <!-- Unique id for javadoc JAR -->
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>javadoc</classifier> <!-- Classifier for javadoc -->
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+
 
 
     <properties>

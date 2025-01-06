@@ -20,7 +20,7 @@ public class ExcelConverter {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 600);
 
-        String iconPath = "src/main/resources/icon.png"; // Adjust path if needed
+        String iconPath = "src/main/resources/icon.png";
         File iconFile = new File(iconPath);
         if (iconFile.exists()) {
             ImageIcon icon = new ImageIcon(iconFile.getAbsolutePath());
@@ -155,86 +155,83 @@ public class ExcelConverter {
 
             DefaultTableModel model = (DefaultTableModel) table.getModel();
 
-            // Get the date from A2 (second row, first column)
-            String siparisTarihi = model.getValueAt(1, 0).toString(); // A2 is row 1, column 0
+
+            String orderDate = model.getValueAt(1, 0).toString(); // A2 is row 1, column 0
 
             // Get the "Yük Numarası" from A1 (first row, first column)
             String a1Value = model.getValueAt(0, 0).toString(); // A1 is row 0, column 0
-            String yukNumarasi = extractYukNumarasi(a1Value);
+            String cargoNo = extractCargoNo(a1Value);
 
-            // Iterate through the rows of the input table
+
             for (int i = 0; i < model.getRowCount(); i++) {
                 Row row = sheet.createRow(i + 1);
 
-                // Proje: Always "Toyota"
+
                 row.createCell(0).setCellValue("Toyota");
-                // Müşteri: Always "00005"
+
                 row.createCell(1).setCellValue("00005");
-                // Sipariş Durumu: Always "Oluşturuldu"
+
                 row.createCell(2).setCellValue("Oluşturuldu");
-                // Sipariş Türü: Always "Müşteriden Alınacak"
+
                 row.createCell(3).setCellValue("Müşteriden Alınacak");
-                // Yükleme Tipi: Always "Parsiyel"
+
                 row.createCell(4).setCellValue("Parsiyel");
 
-                // Sipariş Tarihi: From A2 (siparisTarihi)
-                row.createCell(5).setCellValue(siparisTarihi);
+                row.createCell(5).setCellValue(orderDate);
 
-                // Yükleme Firması: Always "00005"
+
                 row.createCell(6).setCellValue("00005");
 
-                // Yükleme Firması Adres Tipi: First word of "Bayi Adı" (cell 1)
-                String bayiAdı = model.getValueAt(4, 3).toString();
-                String[] bayiAdıParts = bayiAdı.split(" ");
-                row.createCell(7).setCellValue(bayiAdıParts.length > 0 ? bayiAdıParts[0] : "");
 
-                // Boşaltma Firması: Second word of "Bayi Adı"
-                row.createCell(8).setCellValue(bayiAdıParts.length > 1 ? bayiAdıParts[1] : "");
+                String dealerName = model.getValueAt(4, 3).toString();
+                String[] dealerNameParts = dealerName.split(" ");
+                row.createCell(7).setCellValue(dealerNameParts.length > 0 ? dealerNameParts[0] : "");
 
-                // Boşaltma Firması Adres Tipi: First word of "Bayi Adı"
-                row.createCell(9).setCellValue(bayiAdıParts.length > 0 ? bayiAdıParts[0] : "");
 
-                // Müşteri İrsaliye: From "İrsaliye No" (cell 2)
+                row.createCell(8).setCellValue(dealerNameParts.length > 1 ? dealerNameParts[1] : "");
+
+
+                row.createCell(9).setCellValue(dealerNameParts.length > 0 ? dealerNameParts[0] : "");
+
+
                 row.createCell(10).setCellValue(model.getValueAt(7, 3).toString());
 
-                // İrsaliye Seri: Left empty
                 row.createCell(11).setCellValue("");
 
-                // İrsaliye No: Left empty
+
                 row.createCell(12).setCellValue("");
 
-                // Yük Numarası: Using the extracted value
-                row.createCell(13).setCellValue(yukNumarasi);
 
-                // Model: From "Mal Adı" (cell 6)
+                row.createCell(13).setCellValue(cargoNo);
+
+
                 row.createCell(14).setCellValue(model.getValueAt(i, 6).toString());
 
-                // Şasi No: From "Şasi No" (cell 4)
+
                 row.createCell(15).setCellValue(model.getValueAt(i, 8).toString());
 
-                // Lokasyon: First word of "Bayi Adı" (cell 1)
-                row.createCell(16).setCellValue(bayiAdıParts.length > 0 ? bayiAdıParts[0] : "");
 
-                // Marka: Always "TOYOTA"
+                row.createCell(16).setCellValue(dealerNameParts.length > 0 ? dealerNameParts[0] : "");
+
+
                 row.createCell(17).setCellValue("TOYOTA");
 
-                // Kap Cinsi: Always "Araç"
                 row.createCell(18).setCellValue("Araç");
 
-                // Adet: From "F12" (cell F12, row 11, column 5)
-                String adetStr = model.getValueAt(11, 5).toString(); // F12 is row 11, column 5
-                double adetDouble = 0.0;
+
+                String amountStr = model.getValueAt(11, 5).toString(); // F12 is row 11, column 5
+                double amountDouble = 0.0;
 
                 try {
-                    adetDouble = Double.parseDouble(adetStr); // Parse as double
+                    amountDouble = Double.parseDouble(amountStr);
                 } catch (NumberFormatException e) {
-                    // Handle case if F12 is not a valid number (could be empty or non-numeric)
-                    System.out.println("Invalid number format for Adet: " + adetStr);
+
+                    System.out.println("Invalid number format for Adet: " + amountStr);
                 }
 
-                // Optionally, round the value to the nearest integer or just cast to int
-                int adet = (int) Math.round(adetDouble); // Round to the nearest integer
-                row.createCell(19).setCellValue(adet);
+
+                int amount = (int) Math.round(amountDouble);
+                row.createCell(19).setCellValue(amount);
             }
 
             try (FileOutputStream fos = new FileOutputStream(outputFile)) {
@@ -247,15 +244,15 @@ public class ExcelConverter {
         }
     }
 
-    // Method to extract Yük Numarası (TIR part) from the given string
-    private static String extractYukNumarasi(String input) {
+
+    private static String extractCargoNo(String input) {
         // Using regular expression to match "TIR" followed by digits
         Pattern pattern = Pattern.compile("TIR\\d+");
         Matcher matcher = pattern.matcher(input);
         if (matcher.find()) {
-            return matcher.group(); // Return the matched "TIR" followed by digits
+            return matcher.group();
         }
-        return ""; // Return empty string if no match found
+        return "";
     }
 
 }
