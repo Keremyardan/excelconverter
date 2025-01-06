@@ -155,80 +155,47 @@ public class ExcelConverter {
 
             DefaultTableModel model = (DefaultTableModel) table.getModel();
 
-
             String orderDate = model.getValueAt(1, 0).toString(); // A2 is row 1, column 0
 
             // Get the "Yük Numarası" from A1 (first row, first column)
             String a1Value = model.getValueAt(0, 0).toString(); // A1 is row 0, column 0
             String cargoNo = extractCargoNo(a1Value);
 
+            for (int i = 1; i < model.getRowCount(); i++) {  // Start from index 1 to skip header
+                Row row = sheet.createRow(i);
 
-            for (int i = 0; i < model.getRowCount(); i++) {
-                Row row = sheet.createRow(i + 1);
-
-
+                // Add values to the row
                 row.createCell(0).setCellValue("Toyota");
-
                 row.createCell(1).setCellValue("00005");
-
                 row.createCell(2).setCellValue("Oluşturuldu");
-
                 row.createCell(3).setCellValue("Müşteriden Alınacak");
-
                 row.createCell(4).setCellValue("Parsiyel");
-
                 row.createCell(5).setCellValue(orderDate);
-
-
                 row.createCell(6).setCellValue("00005");
 
-
-                String dealerName = model.getValueAt(4, 3).toString();
+                String dealerName = model.getValueAt(i, 3).toString();
                 String[] dealerNameParts = dealerName.split(" ");
                 row.createCell(7).setCellValue(dealerNameParts.length > 0 ? dealerNameParts[0] : "");
-
-
                 row.createCell(8).setCellValue(dealerNameParts.length > 1 ? dealerNameParts[1] : "");
-
-
                 row.createCell(9).setCellValue(dealerNameParts.length > 0 ? dealerNameParts[0] : "");
-
-
-                row.createCell(10).setCellValue(model.getValueAt(7, 3).toString());
-
+                row.createCell(10).setCellValue(model.getValueAt(i, 6).toString());
                 row.createCell(11).setCellValue("");
-
-
                 row.createCell(12).setCellValue("");
-
-
                 row.createCell(13).setCellValue(cargoNo);
-
-
-                row.createCell(14).setCellValue(model.getValueAt(i, 6).toString());
-
-
+                row.createCell(14).setCellValue(model.getValueAt(i, 10).toString());
                 row.createCell(15).setCellValue(model.getValueAt(i, 8).toString());
-
-
                 row.createCell(16).setCellValue(dealerNameParts.length > 0 ? dealerNameParts[0] : "");
-
-
                 row.createCell(17).setCellValue("TOYOTA");
-
                 row.createCell(18).setCellValue("Araç");
 
-
-                String amountStr = model.getValueAt(11, 5).toString(); // F12 is row 11, column 5
+                String amountStr = model.getValueAt(i, 5).toString(); // F12 is row 11, column 5
                 double amountDouble = 0.0;
 
                 try {
                     amountDouble = Double.parseDouble(amountStr);
                 } catch (NumberFormatException e) {
-
                     System.out.println("Invalid number format for Adet: " + amountStr);
                 }
-
 
                 int amount = (int) Math.round(amountDouble);
                 row.createCell(19).setCellValue(amount);
@@ -243,6 +210,7 @@ public class ExcelConverter {
             JOptionPane.showMessageDialog(null, "Error exporting file: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
 
 
     private static String extractCargoNo(String input) {
