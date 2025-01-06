@@ -189,15 +189,10 @@ public class ExcelConverter {
                 row.createCell(18).setCellValue("Araç");
 
                 String amountStr = model.getValueAt(i, 5).toString(); // F12 is row 11, column 5
-                double amountDouble = 0.0;
 
-                try {
-                    amountDouble = Double.parseDouble(amountStr);
-                } catch (NumberFormatException e) {
-                    System.out.println("Invalid number format for Adet: " + amountStr);
-                }
+                // Check if the value is numeric before parsing
+                int amount = isNumeric(amountStr) ? (int) Math.round(Double.parseDouble(amountStr)) : 0;
 
-                int amount = (int) Math.round(amountDouble);
                 row.createCell(19).setCellValue(amount);
             }
 
@@ -210,6 +205,19 @@ public class ExcelConverter {
             JOptionPane.showMessageDialog(null, "Error exporting file: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+    private static boolean isNumeric(String str) {
+        if (str == null || str.isEmpty()) {
+            return false;
+        }
+        try {
+            Double.parseDouble(str); // Try parsing the string as a double
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
 
 
 
