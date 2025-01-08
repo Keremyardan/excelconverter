@@ -56,7 +56,6 @@ public class ExcelConverter {
         JScrollPane scrollPane = new JScrollPane(table);
 
 
-
         openButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
@@ -75,8 +74,8 @@ public class ExcelConverter {
             if (option == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
 
-                    loadExcelToTable(file, table);
-                    exportButton.setEnabled(true);
+                loadExcelToTable(file, table);
+                exportButton.setEnabled(true);
 
 
             }
@@ -104,7 +103,6 @@ public class ExcelConverter {
         frame.add(panel);
         frame.setVisible(true);
     }
-
 
 
     public static void loadExcelToTable(File file, JTable table) {
@@ -138,35 +136,34 @@ public class ExcelConverter {
             JOptionPane.showMessageDialog(null, "Error loading file: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
     private static boolean isValidDate(Row row) {
         if (row == null) return false;
 
-        // Check if the second row (A2) contains a valid date
-        Cell cell = row.getCell(0); // A2 is row 1, column 0
 
-        // Check if the cell contains a valid date
+        Cell cell = row.getCell(0);
+
+
         return isDate(cell);
     }
 
     private static boolean isDate(Cell cell) {
         if (cell == null) return false;
         if (cell.getCellType() == CellType.NUMERIC && DateUtil.isCellDateFormatted(cell)) {
-            return true; // Cell is a recognized date
+            return true;
         }
         if (cell.getCellType() == CellType.STRING) {
-            // Try parsing the string as a date (you can use SimpleDateFormat or a similar method)
             String cellValue = cell.getStringCellValue();
             try {
-                // Assuming the date format in your example is dd/MM/yyyy
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                 sdf.setLenient(false);
-                sdf.parse(cellValue); // Try parsing the string as a date
+                sdf.parse(cellValue);
                 return true;
             } catch (ParseException e) {
-                return false; // Not a valid date format
+                return false;
             }
         }
-        return false; // Not a date
+        return false;
     }
 
 
@@ -216,7 +213,7 @@ public class ExcelConverter {
             DefaultTableModel model = (DefaultTableModel) table.getModel();
 
 
-            String orderDate = model.getValueAt(1, 0).toString(); // A2 is row 1, column 0
+            String orderDate = model.getValueAt(1, 0).toString();
 
 
             String a1Value = model.getValueAt(0, 0).toString();
@@ -224,6 +221,8 @@ public class ExcelConverter {
 
 
             for (int i = 1; i < model.getRowCount(); i++) {
+
+
                 Row row = sheet.createRow(i);
 
                 row.createCell(0).setCellValue("Toyota");
@@ -236,10 +235,14 @@ public class ExcelConverter {
 
                 String dealerName = model.getValueAt(i, 3).toString();
                 String[] dealerNameParts = dealerName.split(" ");
+
+
                 row.createCell(7).setCellValue(dealerNameParts.length > 0 ? dealerNameParts[0] : "");
                 row.createCell(8).setCellValue(dealerNameParts.length > 1 ? dealerNameParts[1] : "");
                 row.createCell(9).setCellValue(dealerNameParts.length > 0 ? dealerNameParts[0] : "");
                 row.createCell(10).setCellValue(model.getValueAt(i, 6).toString());
+
+
                 row.createCell(11).setCellValue("");
                 row.createCell(12).setCellValue("");
                 row.createCell(13).setCellValue(cargoNo);
@@ -254,6 +257,7 @@ public class ExcelConverter {
 
 
                 row.createCell(19).setCellValue(formattedAmount);
+
 
             }
 
