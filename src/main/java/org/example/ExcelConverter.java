@@ -169,7 +169,7 @@ public class ExcelConverter {
             for (int i = 1; i < model.getRowCount(); i++) {
                 Row row = sheet.createRow(i);
 
-                row.createCell(0).setCellValue("TOYOTA");
+                row.createCell(0).setCellValue("Toyota");
                 row.createCell(1).setCellValue("00005");
                 row.createCell(2).setCellValue("Oluşturuldu");
                 row.createCell(3).setCellValue("Müşteriden Alınacak");
