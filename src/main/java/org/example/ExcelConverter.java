@@ -192,11 +192,11 @@ public class ExcelConverter {
                 row.createCell(17).setCellValue("TOYOTA");
                 row.createCell(18).setCellValue("Araç");
 
-                String amountStr = model.getValueAt(i, 5).toString(); // F12 is row 11, column 5
+                String amountStr = model.getValueAt(i, 5).toString();
                 String formattedAmount = removeTrailingZeros(amountStr);
 
 
-                row.createCell(19).setCellValue(formattedAmount); // Column 19 is where "Adet" is
+                row.createCell(19).setCellValue(formattedAmount);
 
             }
 
@@ -220,8 +220,6 @@ public class ExcelConverter {
         }
         return value;
     }
-
-
 
 
     private static String extractCargoNo(String input) {
