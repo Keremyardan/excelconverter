@@ -175,7 +175,7 @@ public class ExcelConverter {
                 row.createCell(3).setCellValue("Müşteriden Alınacak");
                 row.createCell(4).setCellValue("Parsiyel");
                 row.createCell(5).setCellValue(orderDate);
-                row.createCell(6).setCellValue("00005");
+                row.createCell(6).setCellValue("0005");
 
                 String dealerName = model.getValueAt(i, 3).toString();
                 String[] dealerNameParts = dealerName.split(" ");
