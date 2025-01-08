@@ -213,7 +213,7 @@ public class ExcelConverter {
 
 
     private static String removeTrailingZeros(String value) {
-        // Check if the value contains a decimal point
+
         if (value.contains(".")) {
 
             value = value.replaceAll("0*$", "").replaceAll("\\.$", "");
