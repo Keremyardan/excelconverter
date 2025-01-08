@@ -55,6 +55,18 @@ public class ExcelConverter {
 
         openButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
+                @Override
+                public boolean accept(File file) {
+                    // Allow directories and .xls/.xlsx files
+                    return file.isDirectory() || file.getName().toLowerCase().endsWith(".xls") || file.getName().toLowerCase().endsWith(".xlsx");
+                }
+
+                @Override
+                public String getDescription() {
+                    return "Excel Files (*.xls, *.xlsx)";
+                }
+            });
             int option = fileChooser.showOpenDialog(frame);
             if (option == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
