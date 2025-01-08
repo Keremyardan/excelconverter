@@ -53,6 +53,8 @@ public class ExcelConverter {
         JTable table = new JTable();
         JScrollPane scrollPane = new JScrollPane(table);
 
+
+
         openButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
@@ -70,8 +72,11 @@ public class ExcelConverter {
             int option = fileChooser.showOpenDialog(frame);
             if (option == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
-                loadExcelToTable(file, table);
-                exportButton.setEnabled(true);
+                if(validateInputFile(file)) {
+                    loadExcelToTable(file, table);
+                    exportButton.setEnabled(true);
+                }
+
             }
         });
 
@@ -96,6 +101,33 @@ public class ExcelConverter {
 
         frame.add(panel);
         frame.setVisible(true);
+    }
+
+    public static boolean validateInputFile(File file) {
+        try(FileInputStream fis = new FileInputStream(file); Workbook workbook = new XSSFWorkbook(fis)) {
+            Sheet sheet = workbook.getSheetAt(0);
+
+            Row firstRow = sheet.getRow(0);
+            if(firstRow == null || firstRow.getPhysicalNumberOfCells() <10) {
+                JOptionPane.showMessageDialog(null, "Geçersiz dosya", "Hata", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+            String[] expectedHeaders = {"Týr No", "Bayi Adý", "Ýrsaliye No", "Renk Kodu", "Þasi No","Lokasyon", "Mal Adý", "Durum", "Sevk Bayi", "Sevk Rota Kodu"};
+            for (int i = 0; i<expectedHeaders.length; i++ ) {
+                String header = firstRow.getCell(i).getStringCellValue().trim();
+                if(!header.equals(expectedHeaders[i])) {
+                    JOptionPane.showMessageDialog(null,"Geçersiz dosya", "Hata", JOptionPane.ERROR_MESSAGE);
+                    return false;
+                }
+
+
+            }
+            return true;
+
+        }catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, "Dosya Okuma Hatası" + ex.getMessage(), "Hata", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
     }
 
     public static void loadExcelToTable(File file, JTable table) {
