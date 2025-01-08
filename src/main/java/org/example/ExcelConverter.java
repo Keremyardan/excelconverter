@@ -7,6 +7,8 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -72,10 +74,10 @@ public class ExcelConverter {
             int option = fileChooser.showOpenDialog(frame);
             if (option == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
-                if(validateInputFile(file)) {
+
                     loadExcelToTable(file, table);
                     exportButton.setEnabled(true);
-                }
+
 
             }
         });
@@ -103,37 +105,17 @@ public class ExcelConverter {
         frame.setVisible(true);
     }
 
-    public static boolean validateInputFile(File file) {
-        try(FileInputStream fis = new FileInputStream(file); Workbook workbook = new XSSFWorkbook(fis)) {
-            Sheet sheet = workbook.getSheetAt(0);
 
-            Row firstRow = sheet.getRow(0);
-            if(firstRow == null || firstRow.getPhysicalNumberOfCells() <10) {
-                JOptionPane.showMessageDialog(null, "Geçersiz dosya", "Hata", JOptionPane.ERROR_MESSAGE);
-                return false;
-            }
-            String[] expectedHeaders = {"Týr No", "Bayi Adý", "Ýrsaliye No", "Renk Kodu", "Þasi No","Lokasyon", "Mal Adý", "Durum", "Sevk Bayi", "Sevk Rota Kodu"};
-            for (int i = 0; i<expectedHeaders.length; i++ ) {
-                String header = firstRow.getCell(i).getStringCellValue().trim();
-                if(!header.equals(expectedHeaders[i])) {
-                    JOptionPane.showMessageDialog(null,"Geçersiz dosya", "Hata", JOptionPane.ERROR_MESSAGE);
-                    return false;
-                }
-
-
-            }
-            return true;
-
-        }catch (IOException ex) {
-            JOptionPane.showMessageDialog(null, "Dosya Okuma Hatası" + ex.getMessage(), "Hata", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-    }
 
     public static void loadExcelToTable(File file, JTable table) {
         try (FileInputStream fis = new FileInputStream(file); Workbook workbook = new XSSFWorkbook(fis)) {
             Sheet sheet = workbook.getSheetAt(0);
             DefaultTableModel model = new DefaultTableModel();
+            if (!isValidDate(sheet.getRow(1))) {
+                JOptionPane.showMessageDialog(null, "Yanlış Dosya Formatı!", "Hata", JOptionPane.ERROR_MESSAGE);
+                return; // Stop execution if A2 doesn't contain a valid date
+            }
+
 
             int columnCount = sheet.getRow(0).getPhysicalNumberOfCells();
             for (int i = 0; i < columnCount; i++) {
@@ -156,6 +138,37 @@ public class ExcelConverter {
             JOptionPane.showMessageDialog(null, "Error loading file: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+    private static boolean isValidDate(Row row) {
+        if (row == null) return false;
+
+        // Check if the second row (A2) contains a valid date
+        Cell cell = row.getCell(0); // A2 is row 1, column 0
+
+        // Check if the cell contains a valid date
+        return isDate(cell);
+    }
+
+    private static boolean isDate(Cell cell) {
+        if (cell == null) return false;
+        if (cell.getCellType() == CellType.NUMERIC && DateUtil.isCellDateFormatted(cell)) {
+            return true; // Cell is a recognized date
+        }
+        if (cell.getCellType() == CellType.STRING) {
+            // Try parsing the string as a date (you can use SimpleDateFormat or a similar method)
+            String cellValue = cell.getStringCellValue();
+            try {
+                // Assuming the date format in your example is dd/MM/yyyy
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                sdf.setLenient(false);
+                sdf.parse(cellValue); // Try parsing the string as a date
+                return true;
+            } catch (ParseException e) {
+                return false; // Not a valid date format
+            }
+        }
+        return false; // Not a date
+    }
+
 
     private static Object getCellValue(Cell cell) {
         if (cell == null) return "";
