@@ -12,6 +12,8 @@ import java.text.SimpleDateFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.apache.commons.lang3.StringUtils.isNumeric;
+
 public class ExcelConverter {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(ExcelConverter::createAndShowGUI);
@@ -221,42 +223,48 @@ public class ExcelConverter {
 
 
             for (int i = 1; i < model.getRowCount(); i++) {
+                String receiptNo = model.getValueAt(i, 0) != null ? model.getValueAt(i, 0).toString() : "";
 
 
-                Row row = sheet.createRow(i);
+                Row row = null;
+                if (!receiptNo.isEmpty()) {
+                    row = sheet.createRow(i);
 
-                row.createCell(0).setCellValue("Toyota");
-                row.createCell(1).setCellValue("00005");
-                row.createCell(2).setCellValue("Oluşturuldu");
-                row.createCell(3).setCellValue("Müşteriden Alınacak");
-                row.createCell(4).setCellValue("Parsiyel");
-                row.createCell(5).setCellValue(orderDate);
-                row.createCell(6).setCellValue("0005");
+                    row.createCell(0).setCellValue("Toyota");
+                    row.createCell(1).setCellValue("00005");
+                    row.createCell(2).setCellValue("Oluşturuldu");
+                    row.createCell(3).setCellValue("Müşteriden Alınacak");
+                    row.createCell(4).setCellValue("Parsiyel");
+                    row.createCell(5).setCellValue(orderDate);
+                    row.createCell(6).setCellValue("0005");
 
-                String dealerName = model.getValueAt(i, 3).toString();
-                String[] dealerNameParts = dealerName.split(" ");
-
-
-                row.createCell(7).setCellValue(dealerNameParts.length > 0 ? dealerNameParts[0] : "");
-                row.createCell(8).setCellValue(dealerNameParts.length > 1 ? dealerNameParts[1] : "");
-                row.createCell(9).setCellValue(dealerNameParts.length > 0 ? dealerNameParts[0] : "");
-                row.createCell(10).setCellValue(model.getValueAt(i, 6).toString());
+                    String dealerName = model.getValueAt(i, 3).toString();
+                    String[] dealerNameParts = dealerName.split(" ");
 
 
-                row.createCell(11).setCellValue("");
-                row.createCell(12).setCellValue("");
-                row.createCell(13).setCellValue(cargoNo);
-                row.createCell(14).setCellValue(model.getValueAt(i, 10).toString());
-                row.createCell(15).setCellValue(model.getValueAt(i, 8).toString());
-                row.createCell(16).setCellValue(dealerNameParts.length > 0 ? dealerNameParts[0] : "");
-                row.createCell(17).setCellValue("TOYOTA");
-                row.createCell(18).setCellValue("Araç");
-
-                String amountStr = model.getValueAt(i, 5).toString();
-                String formattedAmount = removeTrailingZeros(amountStr);
+                    row.createCell(7).setCellValue(dealerNameParts.length > 0 ? dealerNameParts[0] : "");
+                    row.createCell(8).setCellValue(dealerNameParts.length > 1 ? dealerNameParts[1] : "");
+                    row.createCell(9).setCellValue(dealerNameParts.length > 0 ? dealerNameParts[0] : "");
+                    row.createCell(10).setCellValue(model.getValueAt(i, 6).toString());
 
 
-                row.createCell(19).setCellValue(formattedAmount);
+                    row.createCell(11).setCellValue("");
+                    row.createCell(12).setCellValue("");
+                    row.createCell(13).setCellValue(cargoNo);
+                    row.createCell(14).setCellValue(model.getValueAt(i, 10).toString());
+                    row.createCell(15).setCellValue(model.getValueAt(i, 8).toString());
+                    row.createCell(16).setCellValue(dealerNameParts.length > 0 ? dealerNameParts[0] : "");
+                    row.createCell(17).setCellValue("TOYOTA");
+                    row.createCell(18).setCellValue("Araç");
+
+
+                    String adetValueStr = model.getValueAt(i, 5) != null ? model.getValueAt(i, 5).toString().trim() : "";
+                    double adetValue = 0.0;
+                    if (!adetValueStr.isEmpty() && isNumeric(adetValueStr)) {
+                        adetValue = Double.parseDouble(adetValueStr);
+                    }
+                    row.createCell(19).setCellValue(adetValue);
+                }
 
 
             }
