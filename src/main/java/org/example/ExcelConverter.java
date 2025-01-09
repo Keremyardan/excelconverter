@@ -117,14 +117,14 @@ public class ExcelConverter {
             }
 
 
-            int columnCount = sheet.getRow(2).getPhysicalNumberOfCells();
+            int columnCount = sheet.getRow(0).getPhysicalNumberOfCells();
             for (int i = 0; i < columnCount; i++) {
                 char columnLetter = (char) ('A' + i);
                 model.addColumn(String.valueOf(columnLetter));
             }
 
 
-            for (int rowIndex = 3; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
+            for (int rowIndex = 0; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
                 Row row = sheet.getRow(rowIndex);
                 if (row == null) continue;
 
