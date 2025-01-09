@@ -222,13 +222,16 @@ public class ExcelConverter {
             String cargoNo = extractCargoNo(a1Value);
 
 
+
+
             for (int i = 1; i < model.getRowCount(); i++) {
-                String receiptNo = model.getValueAt(i, 0) != null ? model.getValueAt(i, 0).toString() : "";
+
+                String amount = model.getValueAt(i, 6) != null ? model.getValueAt(i, 6).toString() : "";
 
 
-                Row row = null;
-                if (!receiptNo.isEmpty()) {
-                    row = sheet.createRow(i);
+                Row row = sheet.createRow(i);
+                if (!amount.isEmpty()) {
+
 
                     row.createCell(0).setCellValue("Toyota");
                     row.createCell(1).setCellValue("00005");
@@ -256,18 +259,18 @@ public class ExcelConverter {
                     row.createCell(16).setCellValue(dealerNameParts.length > 0 ? dealerNameParts[0] : "");
                     row.createCell(17).setCellValue("TOYOTA");
                     row.createCell(18).setCellValue("Araç");
+                    row.createCell(19).setCellValue(model.getValueAt(i+1,5).toString());
 
 
-                    String adetValueStr = model.getValueAt(i, 5) != null ? model.getValueAt(i, 5).toString().trim() : "";
-                    double adetValue = 0.0;
-                    if (!adetValueStr.isEmpty() && isNumeric(adetValueStr)) {
-                        adetValue = Double.parseDouble(adetValueStr);
-                    }
-                    row.createCell(19).setCellValue(adetValue);
+
                 }
 
 
             }
+
+
+
+
 
 
             try (FileOutputStream fos = new FileOutputStream(outputFile)) {
@@ -278,16 +281,6 @@ public class ExcelConverter {
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "Error exporting file: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
-    }
-
-
-    private static String removeTrailingZeros(String value) {
-
-        if (value.contains(".")) {
-
-            value = value.replaceAll("0*$", "").replaceAll("\\.$", "");
-        }
-        return value;
     }
 
 
