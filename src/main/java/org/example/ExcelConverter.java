@@ -117,13 +117,17 @@ public class ExcelConverter {
             }
 
 
-            int columnCount = sheet.getRow(0).getPhysicalNumberOfCells();
+            int columnCount = sheet.getRow(2).getPhysicalNumberOfCells();
             for (int i = 0; i < columnCount; i++) {
                 char columnLetter = (char) ('A' + i);
                 model.addColumn(String.valueOf(columnLetter));
             }
 
-            for (Row row : sheet) {
+
+            for (int rowIndex = 3; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
+                Row row = sheet.getRow(rowIndex);
+                if (row == null) continue;
+
                 int cellCount = row.getLastCellNum();
                 Object[] rowData = new Object[cellCount];
                 for (int i = 0; i < cellCount; i++) {
@@ -259,6 +263,9 @@ public class ExcelConverter {
                     row.createCell(16).setCellValue(dealerNameParts.length > 0 ? dealerNameParts[0] : "");
                     row.createCell(17).setCellValue("TOYOTA");
                     row.createCell(18).setCellValue("Araç");
+
+
+
                     row.createCell(19).setCellValue(model.getValueAt(i+1,5).toString());
 
 
