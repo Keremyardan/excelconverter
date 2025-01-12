@@ -215,19 +215,27 @@ public class ExcelConverter {
             int rowIndex = 0;
             String firstValueForDate = model.getValueAt(0,0).toString();
             String cargoNo= extractCargoNo(firstValueForDate);
+            String previousInvoiceNo = null;
 
             for (int i = 1; i < model.getRowCount(); i++) {
                 String malAdi = model.getValueAt(i, 10) != null ? model.getValueAt(i, 10).toString() : "";
                 String renkKodu = model.getValueAt(i, 9) != null ? model.getValueAt(i, 9).toString() : "";
+                String currentInvoiceNo = model.getValueAt(i, 6) != null ? model.getValueAt(i, 6).toString() : "";
 
-                // Mal Adı veya Renk Kodu başlık içeriyorsa satırı atla
+                if(previousInvoiceNo != null && !currentInvoiceNo.equals(previousInvoiceNo)) {
+                    sheet.createRow(rowIndex++);
+                }
+
+                previousInvoiceNo=currentInvoiceNo;
+
                 if (malAdi.equalsIgnoreCase("Mal Adý") || renkKodu.equalsIgnoreCase("Renk Kodu") || malAdi.isEmpty() || renkKodu.isEmpty()) {
-                    continue; // Başlık satırını atla
+                    continue;
                 }
 
                 String amount = model.getValueAt(i, 6) != null ? model.getValueAt(i, 6).toString() : "";
 
-                // Her grup için başlıkları yeniden ekle
+
+
                 if (i == 1 || !model.getValueAt(i, 0).equals(model.getValueAt(i - 1, 0))) {
                     Row headerRow = sheet.createRow(rowIndex++);
                     for (int j = 0; j < headers.length; j++) {
