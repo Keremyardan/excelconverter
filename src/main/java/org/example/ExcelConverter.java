@@ -229,13 +229,19 @@ public class ExcelConverter {
 
 
             for (int i = 1; i < model.getRowCount(); i++) {
+                // Mal Adı ve Renk Kodu sütunlarının değerlerini al
+                String malAdi = model.getValueAt(i, 10) != null ? model.getValueAt(i, 10).toString() : "";
+                String renkKodu = model.getValueAt(i, 9) != null ? model.getValueAt(i, 9).toString() : "";
+
+                // Mal Adı veya Renk Kodu başlık içeriyorsa satırı atla
+                if (malAdi.equalsIgnoreCase("Mal Adý") || renkKodu.equalsIgnoreCase("Renk Kodu") || malAdi.isEmpty() || renkKodu.isEmpty()) {
+                    continue; // Başlık satırını atla
+                }
 
                 String amount = model.getValueAt(i, 6) != null ? model.getValueAt(i, 6).toString() : "";
 
-
-                Row row = sheet.createRow(i);
                 if (!amount.isEmpty()) {
-
+                    Row row = sheet.createRow(i);
 
                     row.createCell(0).setCellValue("Toyota");
                     row.createCell(1).setCellValue("00005");
@@ -248,13 +254,10 @@ public class ExcelConverter {
                     String dealerName = model.getValueAt(i, 3).toString();
                     String[] dealerNameParts = dealerName.split(" ");
 
-
                     row.createCell(7).setCellValue(dealerNameParts.length > 0 ? dealerNameParts[0] : "");
                     row.createCell(8).setCellValue(dealerNameParts.length > 1 ? dealerNameParts[1] : "");
                     row.createCell(9).setCellValue(dealerNameParts.length > 0 ? dealerNameParts[0] : "");
                     row.createCell(10).setCellValue(model.getValueAt(i, 6).toString());
-
-
                     row.createCell(11).setCellValue("");
                     row.createCell(12).setCellValue("");
                     row.createCell(13).setCellValue(cargoNo);
@@ -263,17 +266,12 @@ public class ExcelConverter {
                     row.createCell(16).setCellValue(dealerNameParts.length > 0 ? dealerNameParts[0] : "");
                     row.createCell(17).setCellValue("TOYOTA");
                     row.createCell(18).setCellValue("Araç");
-
-
-
-                    row.createCell(19).setCellValue(model.getValueAt(i+1,5).toString());
-
-
-
+                    row.createCell(19).setCellValue(model.getValueAt(i + 1, 5).toString());
                 }
-
-
             }
+
+
+
 
 
 
