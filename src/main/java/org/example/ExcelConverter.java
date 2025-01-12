@@ -200,7 +200,6 @@ public class ExcelConverter {
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Converted Data");
 
-
             String[] headers = {
                     "Proje", "Müşteri", "Sipariş Durumu", "Sipariş Türü", "Yükleme Tipi",
                     "Sipariş Tarihi", "Yükleme Firması", "Yükleme Firması Adres Tipi",
@@ -209,27 +208,15 @@ public class ExcelConverter {
                     "Lokasyon", "Marka", "Kap Cinsi", "Adet"
             };
 
-
-            Row headerRow = sheet.createRow(0);
-            for (int i = 0; i < headers.length; i++) {
-                headerRow.createCell(i).setCellValue(headers[i]);
-            }
-
-
             DefaultTableModel model = (DefaultTableModel) table.getModel();
 
 
-            String orderDate = model.getValueAt(1, 0).toString();
 
-
-            String a1Value = model.getValueAt(0, 0).toString();
-            String cargoNo = extractCargoNo(a1Value);
-
-
-
+            int rowIndex = 0;
+            String firstValueForDate = model.getValueAt(0,0).toString();
+            String cargoNo= extractCargoNo(firstValueForDate);
 
             for (int i = 1; i < model.getRowCount(); i++) {
-                // Mal Adı ve Renk Kodu sütunlarının değerlerini al
                 String malAdi = model.getValueAt(i, 10) != null ? model.getValueAt(i, 10).toString() : "";
                 String renkKodu = model.getValueAt(i, 9) != null ? model.getValueAt(i, 9).toString() : "";
 
@@ -240,15 +227,23 @@ public class ExcelConverter {
 
                 String amount = model.getValueAt(i, 6) != null ? model.getValueAt(i, 6).toString() : "";
 
+                // Her grup için başlıkları yeniden ekle
+                if (i == 1 || !model.getValueAt(i, 0).equals(model.getValueAt(i - 1, 0))) {
+                    Row headerRow = sheet.createRow(rowIndex++);
+                    for (int j = 0; j < headers.length; j++) {
+                        headerRow.createCell(j).setCellValue(headers[j]);
+                    }
+                }
+
                 if (!amount.isEmpty()) {
-                    Row row = sheet.createRow(i);
+                    Row row = sheet.createRow(rowIndex++);
 
                     row.createCell(0).setCellValue("Toyota");
                     row.createCell(1).setCellValue("00005");
                     row.createCell(2).setCellValue("Oluşturuldu");
                     row.createCell(3).setCellValue("Müşteriden Alınacak");
                     row.createCell(4).setCellValue("Parsiyel");
-                    row.createCell(5).setCellValue(orderDate);
+                    row.createCell(5).setCellValue(model.getValueAt(1, 0).toString());
                     row.createCell(6).setCellValue("0005");
 
                     String dealerName = model.getValueAt(i, 3).toString();
@@ -260,7 +255,7 @@ public class ExcelConverter {
                     row.createCell(10).setCellValue(model.getValueAt(i, 6).toString());
                     row.createCell(11).setCellValue("");
                     row.createCell(12).setCellValue("");
-                    row.createCell(13).setCellValue(cargoNo);
+                   row.createCell(13).setCellValue(cargoNo);
                     row.createCell(14).setCellValue(model.getValueAt(i, 10).toString());
                     row.createCell(15).setCellValue(model.getValueAt(i, 8).toString());
                     row.createCell(16).setCellValue(dealerNameParts.length > 0 ? dealerNameParts[0] : "");
@@ -269,14 +264,6 @@ public class ExcelConverter {
                     row.createCell(19).setCellValue(model.getValueAt(i + 1, 5).toString());
                 }
             }
-
-
-
-
-
-
-
-
 
             try (FileOutputStream fos = new FileOutputStream(outputFile)) {
                 workbook.write(fos);
@@ -287,6 +274,7 @@ public class ExcelConverter {
             JOptionPane.showMessageDialog(null, "Error exporting file: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
 
 
     private static String extractCargoNo(String input) {
