@@ -179,7 +179,7 @@ public class ExcelConverter {
 
         switch (cell.getCellType()) {
             case STRING:
-                return cell.getStringCellValue();
+                return fixTurkishChars(cell.getStringCellValue());
             case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
                     return cell.getDateCellValue();
@@ -195,6 +195,21 @@ public class ExcelConverter {
             default:
                 return "";
         }
+    }
+
+    private static String fixTurkishChars(String text) {
+        if (text == null) return "";
+        return text
+                .replace("Ð", "Ğ")
+                .replace("ð", "ğ")
+                .replace("ý", "ı")
+                .replace("Ý", "İ")
+                .replace("þ", "ş")
+                .replace("Þ", "Ş")
+                .replace("Û", "Ü")
+                .replace("û", "ü")
+                .replace("Ò", "Ö")
+                .replace("ò", "ö");
     }
 
     public static void convertToOutputFormat(JTable table, File outputFile) {
@@ -311,7 +326,7 @@ public class ExcelConverter {
                 row.createCell(16).setCellValue(getValue(model,i,3));
                 row.createCell(17).setCellValue("TOYOTA");
                 row.createCell(18).setCellValue("Araç");
-                row.createCell(19).setCellValue( getValue(model, i, 5) );
+                row.createCell(19).setCellValue("1");
 
                 previousInvoiceNo = currentInvoice;
             }
@@ -337,7 +352,7 @@ public class ExcelConverter {
         if (row < 0 || row >= model.getRowCount()) return "";
         if (col < 0 || col >= model.getColumnCount()) return "";
         Object val = model.getValueAt(row, col);
-        return (val == null) ? "" : val.toString().trim();
+        return fixTurkishChars((val == null) ? "" : val.toString().trim());
     }
 
 
