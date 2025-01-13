@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.apache.commons.lang3.StringUtils.isNumeric;
 
 public class ExcelConverter {
@@ -221,8 +222,10 @@ public class ExcelConverter {
                 String renkKodu       = getValue(model, i, 9);
                 String currentInvoice = getValue(model, i, 6);
                 String firstCell      = getValue(model, i, 0);
-                String dealerName     = getValue(model, i, 3);
-
+                //String dealerName     = getValue(model, i, 3);
+                String date = getValue(model,0,0);
+                String[] dateParts = date.split("\\s+");
+                String firstWord = (dateParts.length > 0) ? dateParts[0] : "";
 
                 if (firstCell.trim().equalsIgnoreCase("Proje")) {
                     continue;
@@ -281,12 +284,13 @@ public class ExcelConverter {
                 row.createCell(4).setCellValue("Parsiyel");
 
 
-                row.createCell(5).setCellValue( getValue(model, 1, 0) );
+                row.createCell(5).setCellValue(firstWord);
 
                 row.createCell(6).setCellValue("0005");
 
 
                 //String[] dealerNameParts = dealerName.split(" ");
+
                 row.createCell(7).setCellValue(getValue(model,i,15));
                 row.createCell(8).setCellValue(getValue(model,i,3));
                 row.createCell(9).setCellValue(getValue(model,i,15));
