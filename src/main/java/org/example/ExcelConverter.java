@@ -208,7 +208,10 @@ public class ExcelConverter {
                 .replace("Û", "Ü")
                 .replace("û", "ü")
                 .replace("Ò", "Ö")
-                .replace("ò", "ö");
+                .replace("ò", "ö")
+                .replace("Ýçel", "Mersin")
+                .replace("İçel", "Mersin");
+
     }
 
     public static void convertToOutputFormat(JTable table, File outputFile) {
@@ -256,7 +259,7 @@ public class ExcelConverter {
                 }
 
 
-                if (materialName.isEmpty() || colorCode.isEmpty()) {
+                if (materialName.isEmpty() && colorCode.isEmpty()) {
                     continue;
                 }
 
