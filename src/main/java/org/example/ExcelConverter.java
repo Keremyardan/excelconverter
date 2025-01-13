@@ -113,7 +113,7 @@ public class ExcelConverter {
             DefaultTableModel model = new DefaultTableModel();
             if (!isValidDate(sheet.getRow(1))) {
                 JOptionPane.showMessageDialog(null, "Yanlış Dosya Formatı!", "Hata", JOptionPane.ERROR_MESSAGE);
-                return; // Stop execution if A2 doesn't contain a valid date
+                return;
             }
 
 
@@ -213,63 +213,55 @@ public class ExcelConverter {
             String previousInvoiceNo = null;
             boolean firstDataRow = true;
 
-            // i=1 veya i=2 gibi başlayabilirsiniz. Burada örnek olarak i=1
+
             for (int i = 1; i < model.getRowCount(); i++) {
 
-                // İlgili kolonlardan verileri okuyalım
+
                 String malAdi         = getValue(model, i, 10);
                 String renkKodu       = getValue(model, i, 9);
                 String currentInvoice = getValue(model, i, 6);
-                String firstCell      = getValue(model, i, 0);  // A sütunu
-                String dealerName     = getValue(model, i, 3);  // Yükleme Firması
+                String firstCell      = getValue(model, i, 0);
+                String dealerName     = getValue(model, i, 3);
 
-                // -- 1) İSTEMEDİĞİNİZ SATIRLARI 'continue' İLE ATLA --
 
-                // Eğer ilk hücre "Proje" yazıyorsa atla
                 if (firstCell.trim().equalsIgnoreCase("Proje")) {
                     continue;
                 }
 
-                // Mal Adı "Mal Adı" veya "Mal Adý" veya "Mal Ad" vb. ise atla
-                // (burada contains("Mal Ad") diyerek küçük farkları yakalayın)
+
                 if (malAdi.toUpperCase().contains("MAL AD")) {
                     continue;
                 }
 
-                // Renk Kodu "Renk Kodu" ise atla
+
                 if (renkKodu.toUpperCase().contains("RENK KODU")) {
                     continue;
                 }
 
-                // Şasi No "Şasi No" ise atla (isterseniz)
-                // Veya "Adi" kelimesi geçiyorsa atla
-                // if (someString.toUpperCase().contains("ADI")) { ... }
 
-                // Ayrıca malAdi / renkKodu boşsa da atlayabilirsiniz
                 if (malAdi.isEmpty() || renkKodu.isEmpty()) {
                     continue;
                 }
 
-                // 2) Adet kolonu boşsa atlayın (kodunuzda 6. kolonda "Adet" var mı kontrol edin)
+
                 String amount = getValue(model, i, 6);
                 if (amount.isEmpty()) {
                     continue;
                 }
 
-                // -- 3) Başlık ekleme mantığı (ilk satır veya irsaliye no değişince) --
+
 
                 if (firstDataRow) {
-                    // Başlığı bir kere yaz
+
                     Row headerRow = sheet.createRow(rowIndex++);
                     for (int j = 0; j < headers.length; j++) {
                         headerRow.createCell(j).setCellValue(headers[j]);
                     }
                     firstDataRow = false;
                 } else {
-                    // Invoice no değişince araya boş satır + tekrar başlık
-                    if (previousInvoiceNo != null
-                            && !previousInvoiceNo.isEmpty()
-                            && !currentInvoice.isEmpty()
+
+                    if (
+                           !currentInvoice.isEmpty()
                             && !currentInvoice.equals(previousInvoiceNo))
                     {
                         sheet.createRow(rowIndex++);
@@ -280,7 +272,7 @@ public class ExcelConverter {
                     }
                 }
 
-                // -- 4) Veri satırını yaz --
+
                 Row row = sheet.createRow(rowIndex++);
                 row.createCell(0).setCellValue("Toyota");
                 row.createCell(1).setCellValue("00005");
@@ -288,30 +280,31 @@ public class ExcelConverter {
                 row.createCell(3).setCellValue("Müşteriden Alınacak");
                 row.createCell(4).setCellValue("Parsiyel");
 
-                // Örnek: sipariş tarihini yine 1. satır, 0. kolondan alıyorsanız
+
                 row.createCell(5).setCellValue( getValue(model, 1, 0) );
 
                 row.createCell(6).setCellValue("0005");
 
-                // dealerName (Yükleme Firması)
-                String[] dealerNameParts = dealerName.split(" ");
-                row.createCell(7).setCellValue(dealerNameParts.length > 1 ? dealerNameParts[1] : "");
-                row.createCell(8).setCellValue(dealerNameParts.length > 0 ? dealerNameParts[0] : "");
-                row.createCell(9).setCellValue(dealerNameParts.length > 1 ? dealerNameParts[1] : "");
+
+                //String[] dealerNameParts = dealerName.split(" ");
+                row.createCell(7).setCellValue(getValue(model,i,15));
+                row.createCell(8).setCellValue(getValue(model,i,3));
+                row.createCell(9).setCellValue(getValue(model,i,15));
 
                 row.createCell(10).setCellValue(currentInvoice);
                 row.createCell(11).setCellValue("");
                 row.createCell(12).setCellValue("");
 
-                // Yük numarası (TIR...)
+
                 String cargoNo = extractCargoNo(getValue(model, 0, 0));
                 row.createCell(13).setCellValue(cargoNo);
 
                 row.createCell(14).setCellValue(malAdi);
                 row.createCell(15).setCellValue(getValue(model, i, 8));
-                row.createCell(16).setCellValue(
+                /*row.createCell(16).setCellValue(
                         dealerNameParts.length > 0 ? dealerNameParts[0] : ""
-                );
+                );*/
+                row.createCell(16).setCellValue(getValue(model,i,3));
                 row.createCell(17).setCellValue("TOYOTA");
                 row.createCell(18).setCellValue("Araç");
                 row.createCell(19).setCellValue( getValue(model, i, 5) );
@@ -336,7 +329,6 @@ public class ExcelConverter {
         }
     }
 
-    // Küçük yardımcı metot (null kontrolü vb.)
     private static String getValue(DefaultTableModel model, int row, int col) {
         if (row < 0 || row >= model.getRowCount()) return "";
         if (col < 0 || col >= model.getColumnCount()) return "";
