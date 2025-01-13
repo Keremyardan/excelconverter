@@ -13,7 +13,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.apache.commons.lang3.StringUtils.defaultString;
-import static org.apache.commons.lang3.StringUtils.isNumeric;
 
 public class ExcelConverter {
     public static void main(String[] args) {
@@ -179,7 +178,7 @@ public class ExcelConverter {
 
         switch (cell.getCellType()) {
             case STRING:
-                return fixTurkishChars(cell.getStringCellValue());
+                return characterConverter(cell.getStringCellValue());
             case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
                     return cell.getDateCellValue();
@@ -197,7 +196,7 @@ public class ExcelConverter {
         }
     }
 
-    private static String fixTurkishChars(String text) {
+    private static String characterConverter(String text) {
         if (text == null) return "";
         return text
                 .replace("Ð", "Ğ")
@@ -233,21 +232,21 @@ public class ExcelConverter {
             for (int i = 1; i < model.getRowCount(); i++) {
 
 
-                String malAdi         = getValue(model, i, 10);
+                String materialName         = getValue(model, i, 10);
                 String renkKodu       = getValue(model, i, 9);
                 String currentInvoice = getValue(model, i, 6);
                 String firstCell      = getValue(model, i, 0);
                 //String dealerName     = getValue(model, i, 3);
                 String date = getValue(model,0,0);
                 String[] dateParts = date.split("\\s+");
-                String firstWord = (dateParts.length > 0) ? dateParts[0] : "";
+                String dateCellFirstPart = (dateParts.length > 0) ? dateParts[0] : "";
 
                 if (firstCell.trim().equalsIgnoreCase("Proje")) {
                     continue;
                 }
 
 
-                if (malAdi.toUpperCase().contains("MAL AD")) {
+                if (materialName.toUpperCase().contains("MAL AD")) {
                     continue;
                 }
 
@@ -257,7 +256,7 @@ public class ExcelConverter {
                 }
 
 
-                if (malAdi.isEmpty() || renkKodu.isEmpty()) {
+                if (materialName.isEmpty() || renkKodu.isEmpty()) {
                     continue;
                 }
 
@@ -299,7 +298,7 @@ public class ExcelConverter {
                 row.createCell(4).setCellValue("Parsiyel");
 
 
-                row.createCell(5).setCellValue(firstWord);
+                row.createCell(5).setCellValue(dateCellFirstPart);
 
                 row.createCell(6).setCellValue("0005");
 
@@ -318,7 +317,7 @@ public class ExcelConverter {
                 String cargoNo = extractCargoNo(getValue(model, 0, 0));
                 row.createCell(13).setCellValue(cargoNo);
 
-                row.createCell(14).setCellValue(malAdi);
+                row.createCell(14).setCellValue(materialName);
                 row.createCell(15).setCellValue(getValue(model, i, 8));
                 /*row.createCell(16).setCellValue(
                         dealerNameParts.length > 0 ? dealerNameParts[0] : ""
@@ -352,7 +351,7 @@ public class ExcelConverter {
         if (row < 0 || row >= model.getRowCount()) return "";
         if (col < 0 || col >= model.getColumnCount()) return "";
         Object val = model.getValueAt(row, col);
-        return fixTurkishChars((val == null) ? "" : val.toString().trim());
+        return characterConverter((val == null) ? "" : val.toString().trim());
     }
 
 
