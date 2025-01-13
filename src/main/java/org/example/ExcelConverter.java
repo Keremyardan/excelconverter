@@ -233,7 +233,7 @@ public class ExcelConverter {
 
 
                 String materialName         = getValue(model, i, 10);
-                String renkKodu       = getValue(model, i, 9);
+                String colorCode       = getValue(model, i, 9);
                 String currentInvoice = getValue(model, i, 6);
                 String firstCell      = getValue(model, i, 0);
                 //String dealerName     = getValue(model, i, 3);
@@ -251,12 +251,12 @@ public class ExcelConverter {
                 }
 
 
-                if (renkKodu.toUpperCase().contains("RENK KODU")) {
+                if (colorCode.toUpperCase().contains("RENK KODU")) {
                     continue;
                 }
 
 
-                if (materialName.isEmpty() || renkKodu.isEmpty()) {
+                if (materialName.isEmpty() || colorCode.isEmpty()) {
                     continue;
                 }
 
@@ -277,9 +277,7 @@ public class ExcelConverter {
                     firstDataRow = false;
                 } else {
 
-                    if (
-                           !currentInvoice.isEmpty()
-                            && !currentInvoice.equals(previousInvoiceNo))
+                    if (!currentInvoice.equals(previousInvoiceNo))
                     {
                         sheet.createRow(rowIndex++);
                         Row headerRow2 = sheet.createRow(rowIndex++);
