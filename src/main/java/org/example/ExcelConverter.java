@@ -198,90 +198,176 @@ public class ExcelConverter {
 
     public static void convertToOutputFormat(JTable table, File outputFile) {
         try (Workbook workbook = new XSSFWorkbook()) {
-            Sheet sheet = workbook.createSheet("Converted Data");
+            Sheet sheet = workbook.createSheet("Kitap1");
 
             String[] headers = {
                     "Proje", "Müşteri", "Sipariş Durumu", "Sipariş Türü", "Yükleme Tipi",
                     "Sipariş Tarihi", "Yükleme Firması", "Yükleme Firması Adres Tipi",
-                    "Boşaltma Firması", "Boşaltma Firması Adres Tipi", "Müşteri İrsaliye",
-                    "İrsaliye seri", "İrsaliye no", "Yük Numarası", "Model", "Şasi No",
-                    "Lokasyon", "Marka", "Kap Cinsi", "Adet"
+                    "Boşaltma Firması", "Boşaltma Firması Adres Tipi",
+                    "Müşteri İrsaliye", "İrsaliye seri", "İrsaliye no", "Yük Numarası",
+                    "Model", "Şasi No", "Lokasyon", "Marka", "Kap Cinsi", "Adet"
             };
 
             DefaultTableModel model = (DefaultTableModel) table.getModel();
 
-
-
             int rowIndex = 0;
-            String firstValueForDate = model.getValueAt(0,0).toString();
-            String cargoNo= extractCargoNo(firstValueForDate);
+            String firstValueForDate = model.getValueAt(0, 0).toString();
+            String cargoNo = extractCargoNo(firstValueForDate);
+
+            // Bir önceki satırın (bir önceki aracın) irsaliye no'su
             String previousInvoiceNo = null;
 
+            // İlk veri yazmadan önce (henüz hiçbir satır yazmadık) -> ilk defa başlık yazacağız
+            boolean firstDataRow = true;
+
+            // i=1'den başlıyoruz (kodunuz öyle yapıyor). Gerekirse 0'dan başlayın
             for (int i = 1; i < model.getRowCount(); i++) {
-                String malAdi = model.getValueAt(i, 10) != null ? model.getValueAt(i, 10).toString() : "";
-                String renkKodu = model.getValueAt(i, 9) != null ? model.getValueAt(i, 9).toString() : "";
-                String currentInvoiceNo = model.getValueAt(i, 6) != null ? model.getValueAt(i, 6).toString() : "";
+                // Kolonlardan verileri okuyalım (size göre bu kısımları düzenleyebilirsiniz)
+                String malAdi = model.getValueAt(i, 10) != null
+                        ? model.getValueAt(i, 10).toString()
+                        : "";
+                String renkKodu = model.getValueAt(i, 9) != null
+                        ? model.getValueAt(i, 9).toString()
+                        : "";
+                String currentInvoiceNo = model.getValueAt(i, 6) != null
+                        ? model.getValueAt(i, 6).toString()
+                        : "";
 
-                if(previousInvoiceNo != null && !currentInvoiceNo.equals(previousInvoiceNo)) {
-                    sheet.createRow(rowIndex++);
-                }
-
-                previousInvoiceNo=currentInvoiceNo;
-
-                if (malAdi.equalsIgnoreCase("Mal Adý") || renkKodu.equalsIgnoreCase("Renk Kodu") || malAdi.isEmpty() || renkKodu.isEmpty()) {
+                // “Mal Adı” veya “Renk Kodu” uygun değilse atla
+                if (malAdi.equalsIgnoreCase("Mal Adý")
+                        || renkKodu.equalsIgnoreCase("Renk Kodu")
+                        || malAdi.isEmpty()
+                        || renkKodu.isEmpty())
+                {
                     continue;
                 }
 
-                String amount = model.getValueAt(i, 6) != null ? model.getValueAt(i, 6).toString() : "";
+                // Adet gibi bir kontrol gerekiyorsa -> yoksa atla
+                // (Sizde "amount" = model.getValueAt(i, 6).toString() idi ama
+                // tabloya göre gerçekten Adet mi, emin olun.)
+                String amount = model.getValueAt(i, 6) != null
+                        ? model.getValueAt(i, 6).toString()
+                        : "";
+                if (amount.isEmpty()) {
+                    continue;
+                }
 
-
-
-                if (i == 1 || !model.getValueAt(i, 0).equals(model.getValueAt(i - 1, 0))) {
+                // ---- BAŞLIK YAZMA KOŞULLARI ----
+                if (firstDataRow) {
+                    // 1) Daha ilk satır; direkt başlık yaz
                     Row headerRow = sheet.createRow(rowIndex++);
                     for (int j = 0; j < headers.length; j++) {
                         headerRow.createCell(j).setCellValue(headers[j]);
                     }
+                    firstDataRow = false;
+                }
+                else {
+                    // 2) İrsaliye no değiştiyse -> araya boş satır + başlık satırı
+                    if (previousInvoiceNo != null
+                            && !previousInvoiceNo.isEmpty()
+                            && !currentInvoiceNo.isEmpty()
+                            && !currentInvoiceNo.equals(previousInvoiceNo))
+                    {
+                        // Bir boş satır
+                        sheet.createRow(rowIndex++);
+                        // Sonra tekrar başlık
+                        Row headerRow2 = sheet.createRow(rowIndex++);
+                        for (int j = 0; j < headers.length; j++) {
+                            headerRow2.createCell(j).setCellValue(headers[j]);
+                        }
+                    }
                 }
 
-                if (!amount.isEmpty()) {
-                    Row row = sheet.createRow(rowIndex++);
+                // ---- VERİ SATIRINI YAZMA ----
+                Row row = sheet.createRow(rowIndex++);
 
-                    row.createCell(0).setCellValue("Toyota");
-                    row.createCell(1).setCellValue("00005");
-                    row.createCell(2).setCellValue("Oluşturuldu");
-                    row.createCell(3).setCellValue("Müşteriden Alınacak");
-                    row.createCell(4).setCellValue("Parsiyel");
-                    row.createCell(5).setCellValue(model.getValueAt(1, 0).toString());
-                    row.createCell(6).setCellValue("0005");
+                // Sabitler ve tabloda okuduklarınız -> size ait mantık
+                row.createCell(0).setCellValue("Toyota");           // Proje
+                row.createCell(1).setCellValue("00005");            // Müşteri
+                row.createCell(2).setCellValue("Oluşturuldu");      // Sipariş Durumu
+                row.createCell(3).setCellValue("Müşteriden Alınacak"); // Sipariş Türü
+                row.createCell(4).setCellValue("Parsiyel");         // Yükleme Tipi
 
-                    String dealerName = model.getValueAt(i, 3).toString();
-                    String[] dealerNameParts = dealerName.split(" ");
+                // Sipariş Tarihi -> sizde 1. satır, 0. kolondan çekiyordunuz
+                row.createCell(5).setCellValue(
+                        model.getValueAt(1, 0) != null
+                                ? model.getValueAt(1, 0).toString()
+                                : ""
+                );
 
-                    row.createCell(7).setCellValue(dealerNameParts.length > 0 ? dealerNameParts[0] : "");
-                    row.createCell(8).setCellValue(dealerNameParts.length > 1 ? dealerNameParts[1] : "");
-                    row.createCell(9).setCellValue(dealerNameParts.length > 0 ? dealerNameParts[0] : "");
-                    row.createCell(10).setCellValue(model.getValueAt(i, 6).toString());
-                    row.createCell(11).setCellValue("");
-                    row.createCell(12).setCellValue("");
-                   row.createCell(13).setCellValue(cargoNo);
-                    row.createCell(14).setCellValue(model.getValueAt(i, 10).toString());
-                    row.createCell(15).setCellValue(model.getValueAt(i, 8).toString());
-                    row.createCell(16).setCellValue(dealerNameParts.length > 0 ? dealerNameParts[0] : "");
-                    row.createCell(17).setCellValue("TOYOTA");
-                    row.createCell(18).setCellValue("Araç");
-                    row.createCell(19).setCellValue(model.getValueAt(i + 1, 5).toString());
-                }
+                // Yükleme Firması
+                row.createCell(6).setCellValue("0005");
+
+                // 3. kolondan Dealer Name
+                String dealerName = model.getValueAt(i, 3) != null
+                        ? model.getValueAt(i, 3).toString()
+                        : "";
+                String[] dealerNameParts = dealerName.split(" ");
+
+                // Yükleme Firması Adres Tipi, Boşaltma Firması vs. -> yine tabloya göre
+                row.createCell(7).setCellValue(
+                        dealerNameParts.length > 0 ? dealerNameParts[0] : ""
+                );
+                row.createCell(8).setCellValue(
+                        dealerNameParts.length > 1 ? dealerNameParts[1] : ""
+                );
+                row.createCell(9).setCellValue(
+                        dealerNameParts.length > 0 ? dealerNameParts[0] : ""
+                );
+
+                // Müşteri İrsaliye
+                row.createCell(10).setCellValue(currentInvoiceNo);
+
+                // İrsaliye seri / no
+                row.createCell(11).setCellValue("");
+                row.createCell(12).setCellValue("");
+
+                // Yük Numarası -> TIR...
+                row.createCell(13).setCellValue(cargoNo);
+
+                // Model
+                row.createCell(14).setCellValue(malAdi);
+
+                // Şasi No -> tabloya göre 8. kolondan aldığınız veri
+                row.createCell(15).setCellValue(
+                        model.getValueAt(i, 8) != null
+                                ? model.getValueAt(i, 8).toString()
+                                : ""
+                );
+
+                // Lokasyon -> dealerNameParts[0] vs. (kendi mantığınıza göre)
+                row.createCell(16).setCellValue(
+                        dealerNameParts.length > 0 ? dealerNameParts[0] : ""
+                );
+
+                // Marka
+                row.createCell(17).setCellValue("TOYOTA");
+                // Kap Cinsi
+                row.createCell(18).setCellValue("Araç");
+                // Adet -> kodunuzda i+1,5 idi, ama çoğunlukla i,5 yapmak daha mantıklı
+                row.createCell(19).setCellValue(
+                        model.getValueAt(i, 5) != null
+                                ? model.getValueAt(i, 5).toString()
+                                : ""
+                );
+
+                // Döngü sonunda, bu satırın invoiceNo'su "previous" olur
+                previousInvoiceNo = currentInvoiceNo;
             }
 
+            // Son olarak dosyayı kaydet
             try (FileOutputStream fos = new FileOutputStream(outputFile)) {
                 workbook.write(fos);
             }
 
-            JOptionPane.showMessageDialog(null, "File exported successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "File exported successfully!",
+                    "Success", JOptionPane.INFORMATION_MESSAGE);
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Error exporting file: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Error exporting file: " + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
 
 
 
