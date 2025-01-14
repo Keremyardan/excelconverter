@@ -243,6 +243,9 @@ public class ExcelConverter {
                 String date = getValue(model,0,0);
                 String[] dateParts = date.split("\\s+");
                 String dateCellFirstPart = (dateParts.length > 0) ? dateParts[0] : "";
+                if (!dateCellFirstPart.isEmpty()) {
+                    dateCellFirstPart = dateCellFirstPart.replace("/", ".");
+                }
 
                 if (firstCell.trim().equalsIgnoreCase("Proje")) {
                     continue;
@@ -295,7 +298,7 @@ public class ExcelConverter {
                 row.createCell(0).setCellValue("Toyota");
                 row.createCell(1).setCellValue("00005");
                 row.createCell(2).setCellValue("Oluşturuldu");
-                row.createCell(3).setCellValue("Müşteriden Alınacak");
+                row.createCell(3).setCellValue("Müşteriden Teslim Alınacak");
                 row.createCell(4).setCellValue("Parsiyel");
 
 
