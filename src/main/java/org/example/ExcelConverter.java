@@ -336,14 +336,14 @@ public class ExcelConverter {
             }
 
             JOptionPane.showMessageDialog(null,
-                    "File exported successfully!",
-                    "Success",
+                    "Dosya başarıyla kaydedildi!",
+                    "Başarılı",
                     JOptionPane.INFORMATION_MESSAGE);
 
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null,
-                    "Error exporting file: " + e.getMessage(),
-                    "Error",
+                    "Dosya kaydedilemedi!: " + e.getMessage(),
+                    "Hata:",
                     JOptionPane.ERROR_MESSAGE);
         }
     }
