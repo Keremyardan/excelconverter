@@ -22,7 +22,7 @@ public class ExcelConverter {
     public static void createAndShowGUI() {
         JFrame frame = new JFrame("Reysas ");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 600);
+        frame.setSize(900, 700);
 
         String iconPath = "src/main/resources/icon.png";
         File iconFile = new File(iconPath);
@@ -42,7 +42,7 @@ public class ExcelConverter {
 
         if (logoFile.exists()) {
             ImageIcon logoIcon = new ImageIcon(logoFile.getAbsolutePath());
-            Image scaledImage = logoIcon.getImage().getScaledInstance(800, 200, Image.SCALE_SMOOTH);
+            Image scaledImage = logoIcon.getImage().getScaledInstance(500, 150, Image.SCALE_SMOOTH);
             logoLabel.setIcon(new ImageIcon(scaledImage));
         } else {
             logoLabel.setText("Logo not found!");
