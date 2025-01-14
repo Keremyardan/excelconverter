@@ -1,3 +1,3 @@
-A project that lets you to convert a specific excel file into another format.
+A project that lets you to convert a specific excel file into another format. Created based on company's needs.
 
-![image](https://github.com/user-attachments/assets/3b4e88ee-4f31-40c0-a997-db7c5a60821e)
+<img width="908" alt="Screenshot 2025-01-14 at 15 24 31" src="https://github.com/user-attachments/assets/82c032eb-8262-4e9d-bbc0-587f53e28a18" />
