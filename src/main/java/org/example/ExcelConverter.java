@@ -42,7 +42,7 @@ public class ExcelConverter {
 
         if (logoFile.exists()) {
             ImageIcon logoIcon = new ImageIcon(logoFile.getAbsolutePath());
-            Image scaledImage = logoIcon.getImage().getScaledInstance(400, 100, Image.SCALE_SMOOTH);
+            Image scaledImage = logoIcon.getImage().getScaledInstance(800, 200, Image.SCALE_SMOOTH);
             logoLabel.setIcon(new ImageIcon(scaledImage));
         } else {
             logoLabel.setText("Logo not found!");
